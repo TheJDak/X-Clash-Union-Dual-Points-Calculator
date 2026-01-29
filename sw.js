@@ -1,4 +1,4 @@
-const CACHE_NAME = 'union-points-v1';
+const CACHE_NAME = 'union-points-v14';
 const ASSETS = [
   './',
   './index.html',

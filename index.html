@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no"/>
   <meta name="theme-color" content="#0e0f12"/>
   <link rel="manifest" href="./manifest.webmanifest"/>
   <link rel="stylesheet" href="./styles.css"/>
@@ -10,7 +10,8 @@
 </head>
 <body>
   <div class="app">
-    <header class="topbar">
+    <div class="headerStack">
+      <header class="topbar">
       <img class="logo" src="./vikings-elite-logo.png" alt="Vikings Elite logo"/>
       <div class="titlewrap">
         <div class="title">X-Clash Union Dual</div>
@@ -29,6 +30,7 @@
         Points Calculator
       </button>
     </nav>
+    </div>
 
     <main class="main">
       <!-- Research Levels -->
@@ -86,14 +88,14 @@
           </div>
         </div>
 
+        <div class="actionsHeader tableHeader">
+          <div>Action</div>
+          <div class="center">Quantity</div>
+          <div class="right">Points</div>
+        </div>
+
         <div class="card">
           <div class="cardBody">
-            <div class="tableHeader">
-              <div>Action</div>
-              <div class="right">Qty</div>
-              <div class="right">Pts / item</div>
-              <div class="right">Points</div>
-            </div>
             <div id="actions" class="actions"></div>
           </div>
         </div>

@@ -1,5 +1,30 @@
 const $ = (id) => document.getElementById(id);
 
+
+function showFatalError(err) {
+  try {
+    let bar = document.getElementById('fatalErrorBar');
+    if (!bar) {
+      bar = document.createElement('div');
+      bar.id = 'fatalErrorBar';
+      bar.style.position = 'fixed';
+      bar.style.left = '0';
+      bar.style.right = '0';
+      bar.style.top = '0';
+      bar.style.zIndex = '99999';
+      bar.style.background = '#8b1b1b';
+      bar.style.color = 'white';
+      bar.style.padding = '10px 12px';
+      bar.style.fontFamily = 'system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif';
+      bar.style.fontSize = '12px';
+      bar.style.whiteSpace = 'pre-wrap';
+      document.body.appendChild(bar);
+    }
+    const msg = (err && err.stack) ? String(err.stack) : String(err);
+    bar.textContent = 'App error: ' + msg;
+  } catch {}
+}
+
 const STORE_KEY = 'unionPoints.v2';
 
 const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
@@ -138,91 +163,51 @@ function activateTab(state, which) {
 
 function buildResearchUI(state) {
   const list = $('researchList');
+  if (!list) return;
   list.innerHTML = '';
 
   RESEARCH_KEYS.forEach((key) => {
     const max = maxLevelForKey(key);
-    const lvl = Math.min(max, Number(state.levels[key] || 0));
+    const lvl = Math.min(max, Math.max(0, Number(state.levels[key] || 0)));
+    state.levels[key] = lvl;
+
     const pct = Math.round(levelToPct(lvl) * 100);
 
     const wrap = document.createElement('div');
-    wrap.className = 'researchItem';
+    wrap.className = 'researchItem compact';
     wrap.innerHTML = `
       <div class="researchTop">
-        <div>
-          <div class="researchName">${key}</div>
+        <div class="researchText">
+          <div class="researchName">${escapeHtml(key)}</div>
           <div class="researchPct">+${pct}%</div>
         </div>
-        <div class="badge" id="badge-${cssSafe(key)}">${lvl}</div>
-      </div>
-      <div class="researchControls">
-        <div class="range">
-          <input type="range" min="0" max="${max}" step="1" value="${lvl}" data-key="${escapeAttr(key)}" class="rng"/>
-        </div>
-        <div class="stepper">
-          <button type="button" class="stepBtn dec" data-key="${escapeAttr(key)}">−</button>
-          <input class="stepVal num" inputmode="numeric" type="number" min="0" max="${max}" step="1" value="${lvl}" data-key="${escapeAttr(key)}"/>
-          <button type="button" class="stepBtn inc" data-key="${escapeAttr(key)}">+</button>
+        <div class="researchPick">
+          <select class="lvlSelect" data-key="${escapeAttr(key)}" aria-label="${escapeAttr(key)} level">
+            ${Array.from({length: max + 1}, (_, i) => `<option value="${i}" ${i===lvl?'selected':''}>${i}</option>`).join('')}
+          </select>
         </div>
       </div>
     `;
     list.appendChild(wrap);
   });
 
-  // Bind events
-  list.querySelectorAll('input.rng').forEach((el) => {
-    el.addEventListener('input', () => {
-      const key = el.dataset.key;
-      const max = maxLevelForKey(key);
-      const val = Math.min(max, Number(el.value || 0));
-      state.levels[key] = val;
-      el.value = String(val);
-      syncResearchRow(key, val);
-      saveState(state); setDirty();
-      renderAll(state);
-    });
-  });
+  list.onchange = (e) => {
+    const sel = e.target.closest('select.lvlSelect');
+    if (!sel) return;
+    const key = sel.dataset.key;
+    const max = maxLevelForKey(key);
+    const val = clampInt(sel.value, max);
+    state.levels[key] = val;
 
-  list.querySelectorAll('input.num').forEach((el) => {
-    el.addEventListener('input', () => {
-      const key = el.dataset.key;
-      const max = maxLevelForKey(key);
-      const val = clampInt(el.value, max);
-      state.levels[key] = val;
-      el.value = String(val);
-      syncResearchRow(key, val);
-      saveState(state); setDirty();
-      renderAll(state);
-    });
-  });
+    const item = sel.closest('.researchItem');
+    const pctEl = item ? item.querySelector('.researchPct') : null;
+    if (pctEl) pctEl.textContent = `+${Math.round(levelToPct(val) * 100)}%`;
 
-  list.querySelectorAll('button.inc, button.dec').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const key = btn.dataset.key;
-      const cur = Number(state.levels[key] || 0);
-      const max = maxLevelForKey(key);
-      const next = clampInt(cur + (btn.classList.contains('inc') ? 1 : -1), max);
-      state.levels[key] = next;
-      syncResearchRow(key, next);
-      saveState(state); setDirty();
-      renderAll(state);
-    });
-  });
-
-  function syncResearchRow(key, val){
-    const safe = cssSafe(key);
-    const badge = $('badge-'+safe);
-    if (badge) badge.textContent = String(val);
-    // sync both controls
-    document.querySelectorAll(`[data-key="${cssEscape(key)}"].rng`).forEach(r => r.value = String(val));
-    document.querySelectorAll(`[data-key="${cssEscape(key)}"].num`).forEach(n => n.value = String(val));
-    // pct label
-    const item = badge?.closest('.researchItem');
-    if (item) {
-      const pctEl = item.querySelector('.researchPct');
-      if (pctEl) pctEl.textContent = `+${Math.round(levelToPct(val)*100)}%`;
-    }
-  }
+    saveState(state); setDirty();
+    renderBuffPills(state.levels || {});
+    renderTotals(state);
+    renderSavedBadge();
+  };
 }
 
 function renderBuffPills(levels) {
@@ -256,52 +241,139 @@ function renderActions(state, data) {
   const dayActions = (data.actions || []).filter(a => (a.day || '').toLowerCase() === day.toLowerCase());
   const qtyMap = state.qtyByDay?.[day] || {};
 
-  $('actionCount').textContent = `${dayActions.length} action(s) loaded for ${day}.`;
   const container = $('actions');
   container.innerHTML = '';
+
+  $('actionCount').textContent = `${dayActions.length} action(s) loaded for ${day}.`;
 
   const allPct = levelToPct(levels['All Points Increase']);
   let total = 0;
 
+  // Build cards
   dayActions.forEach((a, idx) => {
+    const qty = Number(qtyMap[idx] || 0);
+
     const buffPct = getBuffPct(levels, a.buff);
     const pointsPerItem = a.basePoints * (1 + allPct + buffPct);
 
-    const qty = Number(qtyMap[idx] || 0);
     const rowPointsRaw = qty * pointsPerItem;
     const rowPoints = applyRounding(rowPointsRaw, roundMode);
-
     total += rowPoints;
 
-    const row = document.createElement('div');
-    row.className = 'actionRow';
-    row.innerHTML = `
-      <div>
-        <div class="actionName">${escapeHtml(a.action)}</div>
-        <div class="small muted">${escapeHtml(a.buff ? a.buff.replace(' Motivation','') : 'No buff')} • ${a.unit && a.unit !== 1 ? `per ${formatNumber(a.unit)}` : 'per 1'}</div>
-      </div>
-      <div><input data-idx="${idx}" inputmode="decimal" type="number" min="0" step="1" value="${qty}"/></div>
-      <div class="right">${formatNumber(pointsPerItem)}</div>
-      <div class="right">${formatNumber(rowPoints)}</div>
-    `;
-    container.appendChild(row);
+    const card = document.createElement('div');
+    card.className = 'actionCard';
+    card.dataset.idx = String(idx);
+
+    const titleRow = document.createElement('div');
+    titleRow.className = 'actionTitleRow';
+    titleRow.textContent = a.action || '';
+
+    const detailRow = document.createElement('div');
+    detailRow.className = 'actionDetailRow';
+
+    // Left: buff + points per item
+    const infoBox = document.createElement('div');
+    infoBox.className = 'actionInfoBox';
+
+    const buffName = (a.buff && a.buff.name) ? a.buff.name : 'No buff';
+    const buffLine = document.createElement('div');
+    buffLine.className = 'actionBuff';
+    buffLine.textContent = `${buffName}${a.unit && a.unit !== 1 ? ` • per ${formatNumber(a.unit)}` : ''}`;
+
+    const ppiLine = document.createElement('div');
+    ppiLine.className = 'actionPpi';
+    ppiLine.textContent = `Pts/item: ${formatNumber(pointsPerItem)}`;
+
+    infoBox.appendChild(buffLine);
+    infoBox.appendChild(ppiLine);
+
+    // Middle: qty input
+    const qtyBox = document.createElement('div');
+    qtyBox.className = 'actionQtyBox';
+    const inp = document.createElement('input');
+    inp.type = 'number';
+    inp.min = '0';
+    inp.step = '1';
+    inp.inputMode = 'numeric';
+    inp.value = String(qty);
+    inp.dataset.idx = String(idx);
+    qtyBox.appendChild(inp);
+
+    // Right: points output
+    const pointsBox = document.createElement('div');
+    pointsBox.className = 'actionPointsBox';
+    const ptsSpan = document.createElement('span');
+    ptsSpan.className = 'actionRowPoints';
+    ptsSpan.textContent = formatNumber(rowPoints);
+    pointsBox.appendChild(ptsSpan);
+
+    detailRow.appendChild(infoBox);
+    detailRow.appendChild(qtyBox);
+    detailRow.appendChild(pointsBox);
+
+    card.appendChild(titleRow);
+    card.appendChild(detailRow);
+    container.appendChild(card);
   });
 
-  // bind qty inputs
-  container.querySelectorAll('input[data-idx]').forEach((inp) => {
-    inp.addEventListener('input', () => {
-      const i = inp.dataset.idx;
-      const v = Number(inp.value || 0);
-      if (!state.qtyByDay) state.qtyByDay = {};
-      if (!state.qtyByDay[day]) state.qtyByDay[day] = {};
-      state.qtyByDay[day][i] = v;
-      saveState(state); setDirty();
-      renderAll(state, data);
-    });
-  });
-
+  // Update totals
   $('totalPoints').textContent = formatNumber(total);
-  $('totalNote').textContent = `${day} • ${roundMode === 'none' ? 'no rounding' : ('rounding: ' + roundMode)}`;
+  updateTotalNote(state, dayActions.length);
+
+  // Save render context for input updates
+  container._ctx = { day, dayActions, levels, roundMode, allPct, data };
+
+  // Bind delegated input once
+  if (!container._bound) {
+    container._bound = true;
+    container.addEventListener('input', (e) => {
+      const el = e.target;
+      if (!(el instanceof HTMLInputElement)) return;
+      const idx = Number(el.dataset.idx);
+      if (!Number.isFinite(idx)) return;
+
+      const ctx = container._ctx;
+      if (!ctx) return;
+
+      // Update state qty
+      const d = ctx.day;
+      state.qtyByDay = state.qtyByDay || {};
+      state.qtyByDay[d] = state.qtyByDay[d] || {};
+      const val = clampInt(el.value, 999999999);
+      state.qtyByDay[d][idx] = val;
+
+      // Recompute this row
+      const a = ctx.dayActions[idx];
+      if (!a) return;
+
+      const buffPct = getBuffPct(state.levels || {}, a.buff);
+      const ppi = a.basePoints * (1 + levelToPct((state.levels || {})['All Points Increase']) + buffPct);
+      const rowRaw = val * ppi;
+      const rowPts = applyRounding(rowRaw, state.roundMode || 'none');
+
+      const card = el.closest('.actionCard');
+      if (card) {
+        const ptsEl = card.querySelector('.actionRowPoints');
+        if (ptsEl) ptsEl.textContent = formatNumber(rowPts);
+        const ppiEl = card.querySelector('.actionPpi');
+        if (ppiEl) ppiEl.textContent = `Pts/item: ${formatNumber(ppi)}`;
+      }
+
+      // Recompute total (fast loop)
+      let tot = 0;
+      for (let i = 0; i < ctx.dayActions.length; i++) {
+        const ai = ctx.dayActions[i];
+        const q = Number((state.qtyByDay?.[d] || {})[i] || 0);
+        const bp = getBuffPct(state.levels || {}, ai.buff);
+        const ppi2 = ai.basePoints * (1 + levelToPct((state.levels || {})['All Points Increase']) + bp);
+        tot += applyRounding(q * ppi2, state.roundMode || 'none');
+      }
+      $('totalPoints').textContent = formatNumber(tot);
+
+      saveState(state);
+      setDirty();
+    }, { passive: true });
+  }
 }
 
 function renderSpeedups(state) {
@@ -404,10 +476,11 @@ async function init() {
 }
 
 function clampInt(value, max=999) {
-  const n = Number(String(v).replace(/[^\d]/g,''));
+  const n = Number(String(value).replace(/[^\d]/g,''));
   if (!isFinite(n)) return 0;
-  return Math.max(0, Math.floor(n));
+  return Math.max(0, Math.min(max, Math.floor(n)));
 }
+
 
 function escapeAttr(s){ return String(s).replace(/"/g, '&quot;'); }
 function escapeHtml(s){ return String(s).replace(/[&<>"']/g, (c)=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c])); }
@@ -424,3 +497,6 @@ init();
     state.levels[k] = Math.min(max, Math.max(0, Number(state.levels[k] || 0)));
   });
 
+
+
+document.addEventListener('DOMContentLoaded', () => { init().catch(showFatalError); });
