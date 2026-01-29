@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover" />
+  <title>Union Dual Pro</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="./favicon.png" />
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="./app.css" />
+</head>
+
+<body class="bg-slate-950 text-white">
+  <div class="app-shell">
+    <!-- Header -->
+    <header class="px-4 pt-4 pb-3">
+      <div class="flex items-start justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <img src="./favicon.png" alt="App Icon" class="h-9 w-9 rounded-xl shadow-soft ring-1 ring-white/10" />
+          <div class="leading-tight">
+            <div class="text-[15px] font-extrabold tracking-wide">UNION DUAL PRO</div>
+            <div class="text-[12px] font-semibold text-sky-300/90 tracking-wide">X-CLASH ULTIMATE SURVIVOR</div>
+          </div>
+        </div>
+
+        <div class="text-right pt-1">
+          <div class="inline-flex items-center gap-2 text-[12px] text-white/70">
+            <span class="h-2 w-2 rounded-full bg-emerald-400"></span>
+            <span id="savedText">Saved —</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Tabs -->
+    <nav class="px-4">
+      <div class="tabbar">
+        <button class="tabbtn" data-tab="calculator">
+          <span class="tabicon">🧮</span>
+          <span>Calculator</span>
+        </button>
+        <button class="tabbtn" data-tab="research">
+          <span class="tabicon">⎇</span>
+          <span>Research</span>
+        </button>
+        <button class="tabbtn" data-tab="speedups">
+          <span class="tabicon">⚡</span>
+          <span>Speedups</span>
+        </button>
+        <span class="tab-highlight" id="tabHighlight"></span>
+      </div>
+    </nav>
+
+    <!-- Content -->
+    <main class="px-4 pt-4 pb-32">
+      <!-- Calculator -->
+      <section id="tab-calculator" class="tabpanel">
+        <div class="grid grid-cols-2 gap-3">
+          <div class="glass-card p-4">
+            <div class="label">Current Day</div>
+            <select id="daySelect" class="select">
+              <option>Monday</option>
+              <option>Tuesday</option>
+              <option>Wednesday</option>
+              <option>Thursday</option>
+              <option>Friday</option>
+              <option>Saturday</option>
+              <option>Sunday</option>
+            </select>
+          </div>
+
+          <div class="glass-card p-4">
+            <div class="label">Rounding</div>
+            <select id="roundingSelect" class="select">
+              <option value="none">None</option>
+              <option value="floor">Floor</option>
+              <option value="ceil">Ceil</option>
+              <option value="nearest">Nearest</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="actionList" class="mt-4 space-y-3"></div>
+      </section>
+
+      <!-- Research -->
+      <section id="tab-research" class="tabpanel hidden">
+        <div class="glass-card p-5">
+          <div class="text-[18px] font-extrabold">Research Center</div>
+          <div class="mt-1 text-[13px] text-white/70">
+            Set your technology levels. Each level provides a <span class="font-semibold text-white/80">+5%</span> point bonus.
+          </div>
+
+          <div class="mt-4 space-y-3" id="researchList"></div>
+        </div>
+      </section>
+
+      <!-- Speedups -->
+      <section id="tab-speedups" class="tabpanel hidden">
+        <div class="glass-card p-5">
+          <div class="text-[18px] font-extrabold">Speedup Calculator</div>
+          <div class="mt-1 text-[13px] text-white/70">Enter your speedup items to see total time values.</div>
+
+          <div class="mt-4 grid grid-cols-2 gap-3" id="speedupsGrid"></div>
+
+          <div class="mt-4 grid grid-cols-2 gap-3">
+            <div class="glass-card p-4">
+              <div class="label">Total Minutes</div>
+              <div id="totalMinutes" class="big-metric">0</div>
+            </div>
+            <div class="glass-card p-4">
+              <div class="label">Total Hours</div>
+              <div id="totalHours" class="big-metric">0.0h</div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Bottom Total Bar -->
+    <div class="bottom-bar">
+      <div class="bottom-inner">
+        <div>
+          <div class="text-[11px] tracking-[0.2em] text-white/70 font-extrabold">TOTAL POINTS</div>
+          <div id="totalPoints" class="text-[30px] font-black leading-none">0</div>
+        </div>
+        <button id="resetBtn" class="reset-btn" title="Reset">
+          ↺
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>
