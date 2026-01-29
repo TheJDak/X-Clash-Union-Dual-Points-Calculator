@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+  <meta name="theme-color" content="#0e0f12"/>
+  <link rel="manifest" href="./manifest.webmanifest"/>
+  <link rel="stylesheet" href="./styles.css"/>
+  <title>X-Clash Union Dual Points Calculator</title>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <img class="logo" src="./vikings-elite-logo.png" alt="Vikings Elite logo"/>
+      <div class="titlewrap">
+        <div class="title">X-Clash Union Dual</div>
+        <div class="subtitle">Points Calculator</div>
+      </div>
+      <div class="status">
+        <span class="tag" id="saveStatus">Saved</span>
+      </div>
+    </header>
+
+    <nav class="tabs" role="tablist" aria-label="App tabs">
+      <button class="tab active" id="tabResearch" role="tab" aria-controls="panelResearch" aria-selected="true">
+        Research Levels
+      </button>
+      <button class="tab" id="tabCalculator" role="tab" aria-controls="panelCalculator" aria-selected="false">
+        Points Calculator
+      </button>
+    </nav>
+
+    <main class="main">
+      <!-- Research Levels -->
+      <section class="panel active" id="panelResearch" role="tabpanel" aria-labelledby="tabResearch">
+        <div class="panelHeader">
+          <h2>Research Levels</h2>
+          <p class="muted">Set your Research Center levels. Each level adds <b>+5%</b> for that category.</p>
+        </div>
+
+        <div id="researchList" class="list"></div>
+
+        <div class="actionsRow">
+          <button class="btn ghost" id="resetBtn" type="button">Reset all inputs</button>
+        </div>
+      </section>
+
+      <!-- Points Calculator -->
+      <section class="panel" id="panelCalculator" role="tabpanel" aria-labelledby="tabCalculator">
+        <div class="panelHeader">
+          <h2>Points Calculator</h2>
+          <p class="muted">Pick a day, enter quantities, and the totals update instantly.</p>
+        </div>
+
+        <div class="card">
+          <div class="cardBody">
+            <div class="row">
+              <div class="field">
+                <label for="daySelect">Day</label>
+                <select id="daySelect"></select>
+              </div>
+
+              <div class="field">
+                <label for="roundMode">Rounding</label>
+                <select id="roundMode">
+                  <option value="none">No rounding</option>
+                  <option value="floor">Round down</option>
+                  <option value="round">Round nearest</option>
+                  <option value="ceil">Round up</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="pillRow" id="buffPills"></div>
+            <div class="small muted" id="actionCount"></div>
+          </div>
+        </div>
+
+        <div class="card totalCard">
+          <div class="cardBody totalBody">
+            <div class="totalLeft">
+              <div class="totalLabel">Total Points</div>
+              <div class="totalNote" id="totalNote"></div>
+            </div>
+            <div class="totalValue" id="totalPoints">0</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="cardBody">
+            <div class="tableHeader">
+              <div>Action</div>
+              <div class="right">Qty</div>
+              <div class="right">Pts / item</div>
+              <div class="right">Points</div>
+            </div>
+            <div id="actions" class="actions"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="cardBody">
+            <h3>Speedup Minutes (optional)</h3>
+            <p class="muted small">Enter speedups and the total minutes / hours will calculate.</p>
+            <div class="row speedRow">
+              <div class="field"><label>8h</label><input id="s8" type="number" min="0" step="1"/></div>
+              <div class="field"><label>3h</label><input id="s3" type="number" min="0" step="1"/></div>
+              <div class="field"><label>1h</label><input id="s1" type="number" min="0" step="1"/></div>
+              <div class="field"><label>15m</label><input id="s15" type="number" min="0" step="1"/></div>
+              <div class="field"><label>5m</label><input id="s5" type="number" min="0" step="1"/></div>
+              <div class="field"><label>1m</label><input id="s1m" type="number" min="0" step="1"/></div>
+            </div>
+            <div class="totalsMini">
+              <div><span class="muted">Total minutes:</span> <span id="speedMinutes">0</span></div>
+              <div><span class="muted">Total hours:</span> <span id="speedHours">0</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+</main>
+  </div>
+
+  <!-- Embedded fallback points data (for when opened as file:// and fetch is blocked) -->
+  <script id="pointsData" type="application/json">
+{
+  "actions": [
+    {
+      "day": "Monday",
+      "action": "Spend 660 Hero EXP",
+      "basePoints": 1.0,
+      "buff": null,
+      "unit": 660.0
+    },
+    {
+      "day": "Monday",
+      "action": "Spend 1 Stamina",
+      "basePoints": 150.0,
+      "buff": null,
+      "unit": 1.0
+    },
+    {
+      "day": "Monday",
+      "action": "Complete 1 Intelligence Quest",
+      "basePoints": 10000.0,
+      "buff": "Intelligence Motivation",
+      "unit": 1.0
+    },
+    {
+      "day": "Monday",
+      "action": "Spend 1 Mytstic Beast EXP",
+      "basePoints": 3.0,
+      "buff": null,
+      "unit": 1.0
+    },
+    {
+      "day": "Monday",
+      "action": "Use Mystic Beast Breakthrough Potion",
+      "basePoints": 2500.0,
+      "buff": null,
+      "unit": 1.0
+    },
+    {
+      "day": "Monday",
+      "action": "Gather 100 Food",
+      "basePoints": 20.0,
+      "buff": null,
+      "unit": 100.0
+    },
+    {
+      "day": "Monday",
+      "action": "Gather 100 Iron",
+      "basePoints": 20.0,
+      "buff": null,
+      "unit": 100.0
+    },
+    {
+      "day": "Monday",
+      "action": "Gather 60 Gold",
+      "basePoints": 20.0,
+      "buff": null,
+      "unit": 60.0
+    },
+    {
+      "day": "Tuesday",
+      "action": "Dispatch 1 Legendary Wagon",
+      "basePoints": 100000.0,
+      "buff": null,
+      "unit": 1.0
+    },
+    {
+      "day": "Tuesday",
+      "action": "Perform 1 orange Tavern Quest",
+      "basePoints": 75000.0,
+      "buff": null,
+      "unit": 1.0
+    },
+    {
+      "day": "Tuesday",
+      "action": "Use 1-minute Building Speed Up",
+      "basePoints": 50.0,
+      "buff": "Accelerator Motivation",
+      "unit": 1.0
+    },
+    {
+      "day": "Tuesday",
+      "action": "Increase Building CP by 1",
+      "basePoints": 10.0,
+      "buff": "Construction Motivation",
+      "unit": 1.0
+    },
+    {
+      "day": "Tuesday",
+      "action": "Perform 1 Survivor Recruitment",
+      "basePoints": 1500.0,
+      "buff": null,
+      "unit": 1.0
+    },
+    {
+      "day": "Wednesday",
+      "action": "Increase technology CP by 1",
+      "basePoints": 10.0,
+      "buff": "Research Motivation",
+      "unit": 1.0
+    },
+    {
+      "day": "Wednesday",
+      "action": "Complete 1 Intelligence Quest",
+      "basePoints": 10000.0,
+      "buff": "Intelligence Motivation",
+      "unit": 1.0
+    },
+    {
+      "day": "Wednesday",
+      "action": "Use 1-Minute Technology Speedup",
+      "basePoints": 50.0,
+      "buff": "Accelerator Motivation",
+      "unit": 1.0
+    },
+    {
+      "day": "Wednesday",
+      "action": "Use 1 Energy Crystal",
+      "basePoints": 300.0,
+      "buff": null,
+      "unit": 1.0
+    },
+    {
+      "day": "Wednesday",
+      "action": "Open 1 Lv. 1 Mystic Beast Mark Chest",
+      "basePoints": 1100.0,
+      "buff": null,
+      "unit": 1.0
+    },
+    {
+      "day": "Wednesday",
+      "action": "Open 1 Lv. 2 Mystic Beast Mark Chest",
+      "basePoints": 3300.0,
+      "buff": null,
+      "unit": 1.0
+    },
+    {
+      "day": "Wednesday",
+      "action": "Open 1 Lv. 3 Mystic Beast Mark Chest",
+      "basePoints": 10000.0,
+      "buff": null,
+      "unit": 1.0
+    },
+    {
+      "day": "Wednesday",
+      "action": "Open 1 Lv. 4 Mystic Beast Mark Chest",
+      "basePoints": 30000.0,
+      "buff": null,
+      "unit": 1.0
+    },
+    {
+      "day": "Wednesday",
+      "action": "Open 1 Lv. 5 Mystic Beast Mark Chest",
+      "basePoints": 90000.0,
+      "buff": null,
+      "unit": 1.0
+    },
+    {
+      "day": "Wednesday",
+      "action": "Open 1 Lv. 6 Mystic Beast Mark Chest",
+      "basePoints": 270000.0,
+      "buff": null,
+      "unit": 1.0
+    },
+    {
+      "day": "Wednesday",
+      "action": "Open 1 Lv. 7 Mystic Beast Mark Chest",
+      "basePoints": 810000.0,
+      "buff": null,
+      "unit": 1.0
+    }
+  ],
+  "days": [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday"
+  ]
+}
+</script>
+
+  <script src="./app.js"></script>
+</body>
+</html>
