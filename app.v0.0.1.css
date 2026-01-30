@@ -14,9 +14,7 @@
     linear-gradient(180deg, rgba(2,6,23,1), rgba(2,6,23,1));
 }
 
-.shadow-soft{
-  box-shadow: 0 18px 40px rgba(0,0,0,0.45);
-}
+.shadow-soft{ box-shadow: 0 18px 40px rgba(0,0,0,0.45); }
 
 .glass-card{
   background: var(--glass);
@@ -51,6 +49,16 @@
   box-shadow: 0 0 0 4px rgba(59,130,246,0.16);
 }
 
+.day-theme{
+  font-weight: 950;
+  font-size: 16px;
+  color: rgba(255,255,255,0.92);
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(0,0,0,0.18);
+  border: 1px solid rgba(255,255,255,0.10);
+}
+
 .tabbar{
   position: relative;
   background: rgba(255,255,255,0.05);
@@ -81,14 +89,9 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.tabbtn.active{
-  color: rgba(255,255,255,0.95);
-}
+.tabbtn.active{ color: rgba(255,255,255,0.95); }
 
-.tabicon{
-  opacity: 0.85;
-  font-size: 14px;
-}
+.tabicon{ opacity: 0.85; font-size: 14px; }
 
 .tab-highlight{
   position: absolute;
@@ -100,13 +103,11 @@
   transition: transform 220ms ease;
   z-index: 1;
 
-  /* IMPORTANT FIX: do not intercept taps/clicks */
+  /* critical: don't intercept taps */
   pointer-events: none;
 }
 
-.action-card{
-  padding: 14px;
-}
+.action-card{ padding: 14px; }
 
 .pill{
   display: inline-flex;
