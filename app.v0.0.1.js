@@ -1,45 +1,96 @@
-/* Union Dual Pro — v0.0.1 */
+/* Union Dual Points Calculator — v0.0.2 */
+
+const DAY_TITLES = {
+  "Monday": "Intelligence Training",
+  "Tuesday": "Castle Construction",
+  "Wednesday": "Technology Research",
+  "Thursday": "Hero Upgrade",
+  "Friday": "Full Preparation",
+  "Saturday": "Defeat the Enemy",
+  "Sunday": "Rest Day"
+};
 
 /* =========================
-   DATA (base points from your sheet)
+   ACTIONS (from your updated "points table" tab)
 ========================= */
-
 const ACTIONS = [
-  // Monday
-  { day: "Monday", action: "Spend 660 Hero EXP", basePoints: 1, buff: "n/a", usage: 660 },
-  { day: "Monday", action: "Spend 1 Stamina", basePoints: 150, buff: "n/a", usage: 1 },
-  { day: "Monday", action: "Complete 1 Intelligence Quest", basePoints: 10000, buff: "Intelligence Motivation", usage: 1 },
-  { day: "Monday", action: "Spend 1 Mytstic Beast EXP", basePoints: 3, buff: "n/a", usage: 1 },
-  { day: "Monday", action: "Use Mystic Beast Breakthrough Potion", basePoints: 2500, buff: "n/a", usage: 1 },
-  { day: "Monday", action: "Gather 100 Food", basePoints: 20, buff: "n/a", usage: 100 },
-  { day: "Monday", action: "Gather 100 Iron", basePoints: 20, buff: "n/a", usage: 100 },
-  { day: "Monday", action: "Gather 60 Gold", basePoints: 20, buff: "n/a", usage: 60 },
+  /* Monday */
+  { day:"Monday", action:"Spend 660 Hero EXP", basePoints:1, buff:"n/a", usage:660 },
+  { day:"Monday", action:"Spend 1 Stamina", basePoints:150, buff:"n/a", usage:1 },
+  { day:"Monday", action:"Complete 1 Intelligence Quest", basePoints:10000, buff:"Intelligence Motivation", usage:1 },
+  { day:"Monday", action:"Spend 1 Mytstic Beast EXP", basePoints:3, buff:"n/a", usage:1 },
+  { day:"Monday", action:"Use Mystic Beast Breakthrough Potion", basePoints:2500, buff:"n/a", usage:1 },
+  { day:"Monday", action:"Gather 100 Food", basePoints:20, buff:"n/a", usage:100 },
+  { day:"Monday", action:"Gather 100 Iron", basePoints:20, buff:"n/a", usage:100 },
+  { day:"Monday", action:"Gather 60 Gold", basePoints:20, buff:"n/a", usage:60 },
 
-  // Tuesday
-  { day: "Tuesday", action: "Dispatch 1 Legendary Wagon", basePoints: 100000, buff: "n/a", usage: 1 },
-  { day: "Tuesday", action: "Dispatch 1 Epic Wagon", basePoints: 40000, buff: "n/a", usage: 1 },
-  { day: "Tuesday", action: "Dispatch 1 Rare Wagon", basePoints: 12000, buff: "n/a", usage: 1 },
-  { day: "Tuesday", action: "Dispatch 1 Common Wagon", basePoints: 2000, buff: "n/a", usage: 1 },
-  { day: "Tuesday", action: "Use 1 Mystery Hero Token", basePoints: 2000, buff: "Summoning Motivation", usage: 1 },
-  { day: "Tuesday", action: "Use 1 Mystery Hero Token (10)", basePoints: 25000, buff: "Summoning Motivation", usage: 10 },
+  /* Tuesday */
+  { day:"Tuesday", action:"Dispatch 1 Legendary Wagon", basePoints:100000, buff:"n/a", usage:1 },
+  { day:"Tuesday", action:"Perform 1 orange Tavern Quest", basePoints:75000, buff:"n/a", usage:1 },
+  { day:"Tuesday", action:"Use 1-minute Building Speed Up", basePoints:50, buff:"Accelerator Motivation", usage:1 },
+  { day:"Tuesday", action:"Increase Building CP by 1", basePoints:10, buff:"Construction Motivation", usage:1 },
+  { day:"Tuesday", action:"Perform 1 Survivor Recruitment", basePoints:1500, buff:"n/a", usage:1 },
 
-  // Wednesday
-  { day: "Wednesday", action: "Use 1 Speedup Min", basePoints: 10, buff: "Accelerator Motivation", usage: 1 },
-  { day: "Wednesday", action: "Use 1 Speedup Hour", basePoints: 600, buff: "Accelerator Motivation", usage: 1 },
+  /* Wednesday */
+  { day:"Wednesday", action:"Spend 1 Mytstic Beast EXP", basePoints:3, buff:"n/a", usage:1 },
+  { day:"Wednesday", action:"Use 1 Mythic Beast EXP Potion", basePoints:3000, buff:"n/a", usage:1 },
+  { day:"Wednesday", action:"Use 1 Mythic Beast Breakthrough Potion", basePoints:2500, buff:"n/a", usage:1 },
+  { day:"Wednesday", action:"Use 1 Hero EXP", basePoints:0.0015, buff:"n/a", usage:1 },
+  { day:"Wednesday", action:"Use 1 Hero EXP Potion", basePoints:1500, buff:"n/a", usage:1 },
+  { day:"Wednesday", action:"Spend 1 Stamina", basePoints:150, buff:"n/a", usage:1 },
+  { day:"Wednesday", action:"Complete 1 Intelligence Quest", basePoints:10000, buff:"Intelligence Motivation", usage:1 },
+  { day:"Wednesday", action:"Use 1-minute Research Speed Up", basePoints:50, buff:"Accelerator Motivation", usage:1 },
+  { day:"Wednesday", action:"Increase Research CP by 1", basePoints:10, buff:"Research Motivation", usage:1 },
+  { day:"Wednesday", action:"Use 1 Mystery Hero Token", basePoints:2000, buff:"Summoning Motivation", usage:1 },
+  { day:"Wednesday", action:"Perform 1 Survivor Recruitment", basePoints:1500, buff:"n/a", usage:1 },
 
-  // Thursday
-  { day: "Thursday", action: "Enemy Kill 1 Point", basePoints: 1, buff: "Enemy Kill Motivation", usage: 1 },
+  /* Thursday */
+  { day:"Thursday", action:"Complete 1 Intelligence Quest", basePoints:10000, buff:"Intelligence Motivation", usage:1 },
+  { day:"Thursday", action:"Use 1 Hero EXP Potion", basePoints:1500, buff:"n/a", usage:1 },
+  { day:"Thursday", action:"Use 1-minute Training Speed Up", basePoints:50, buff:"Accelerator Motivation", usage:1 },
+  { day:"Thursday", action:"Increase Training CP by 1", basePoints:10, buff:"Training Motivation", usage:1 },
+  { day:"Thursday", action:"Enemy Kill 1 Point", basePoints:1, buff:"Enemy Kill Motivation", usage:1 },
+  { day:"Thursday", action:"Train 1 Soldier", basePoints:2, buff:"Training Motivation", usage:1 },
 
-  // Friday
-  { day: "Friday", action: "Complete 1 Research", basePoints: 100000, buff: "Research Motivation", usage: 1 },
+  /* Friday */
+  { day:"Friday", action:"Complete 1 Research", basePoints:100000, buff:"Research Motivation", usage:1 },
+  { day:"Friday", action:"Increase Research CP by 1", basePoints:10, buff:"Research Motivation", usage:1 },
+  { day:"Friday", action:"Use 1-minute Research Speed Up", basePoints:50, buff:"Accelerator Motivation", usage:1 },
+  { day:"Friday", action:"Use 1-minute Building Speed Up", basePoints:50, buff:"Accelerator Motivation", usage:1 },
+  { day:"Friday", action:"Use 1-minute Training Speed Up", basePoints:50, buff:"Accelerator Motivation", usage:1 },
+  { day:"Friday", action:"Use 1-minute Healing Speed Up", basePoints:50, buff:"Accelerator Motivation", usage:1 },
+  { day:"Friday", action:"Increase Building CP by 1", basePoints:10, buff:"Construction Motivation", usage:1 },
+  { day:"Friday", action:"Increase Training CP by 1", basePoints:10, buff:"Training Motivation", usage:1 },
+  { day:"Friday", action:"Increase Healing CP by 1", basePoints:10, buff:"n/a", usage:1 },
+  { day:"Friday", action:"Spend 1 Stamina", basePoints:150, buff:"n/a", usage:1 },
+  { day:"Friday", action:"Use 1 Mystery Hero Token", basePoints:2000, buff:"Summoning Motivation", usage:1 },
+  { day:"Friday", action:"Perform 1 Survivor Recruitment", basePoints:1500, buff:"n/a", usage:1 },
+  { day:"Friday", action:"Enemy Kill 1 Point", basePoints:1, buff:"Enemy Kill Motivation", usage:1 },
+  { day:"Friday", action:"Train 1 Soldier", basePoints:2, buff:"Training Motivation", usage:1 },
+  { day:"Friday", action:"Lose 1 Soldier", basePoints:2, buff:"n/a", usage:1 },
+  { day:"Friday", action:"Use 1 Hero EXP Potion", basePoints:1500, buff:"n/a", usage:1 },
 
-  // Saturday
-  { day: "Saturday", action: "Train 1 Soldier", basePoints: 2, buff: "Training Motivation", usage: 1 },
+  /* Saturday (your expanded “Lose Lv X Soldier” set) */
+  { day:"Saturday", action:"Lose 1 Soldier", basePoints:2, buff:"n/a", usage:1 },
+  { day:"Saturday", action:"Lose 1 Lv. 1 Soldier", basePoints:2, buff:"n/a", usage:1 },
+  { day:"Saturday", action:"Lose 1 Lv. 2 Soldier", basePoints:3, buff:"n/a", usage:1 },
+  { day:"Saturday", action:"Lose 1 Lv. 3 Soldier", basePoints:4, buff:"n/a", usage:1 },
+  { day:"Saturday", action:"Lose 1 Lv. 4 Soldier", basePoints:5, buff:"n/a", usage:1 },
+  { day:"Saturday", action:"Lose 1 Lv. 5 Soldier", basePoints:6, buff:"n/a", usage:1 },
+  { day:"Saturday", action:"Lose 1 Lv. 6 Soldier", basePoints:7, buff:"n/a", usage:1 },
+  { day:"Saturday", action:"Lose 1 Lv. 7 Soldier", basePoints:8, buff:"n/a", usage:1 },
+  { day:"Saturday", action:"Lose 1 Lv. 8 Soldier", basePoints:9, buff:"n/a", usage:1 },
+  { day:"Saturday", action:"Lose 1 Lv. 9 Soldier", basePoints:10, buff:"n/a", usage:1 },
+  { day:"Saturday", action:"Lose 1 Lv. 10 Soldier", basePoints:11, buff:"n/a", usage:1 },
 
-  // Sunday
-  { day: "Sunday", action: "Increase Power 1 Point (Construction)", basePoints: 0.2, buff: "Construction Motivation", usage: 1 },
+  /* Sunday */
+  { day:"Sunday", action:"Rest Day", basePoints:0, buff:"n/a", usage:1 }
 ];
 
+/* Research nodes:
+   - "All Points Increase" applies to everything
+   - action buff applies only to matching action rows
+*/
 const RESEARCH_NODES = [
   { key: "All Points Increase", label: "All Points Increase" },
   { key: "Intelligence Motivation", label: "Intelligence Motivation" },
@@ -60,36 +111,25 @@ const SPEEDUPS = [
   { key: "1m", label: "1M", minutes: 1 },
 ];
 
-const STORAGE_KEY = "union_dual_pro_state_v1";
+const STORAGE_KEY = "union_dual_points_state_v002";
 
 const state = {
   tab: "calculator",
   day: "Monday",
-  rounding: "none",
   research: Object.fromEntries(RESEARCH_NODES.map(n => [n.key, 0])),
-  entries: {},
+  entries: {}, // actionId -> { amount }
   speedups: Object.fromEntries(SPEEDUPS.map(s => [s.key, 0])),
 };
 
 function $(id){ return document.getElementById(id); }
+function safeOn(el, event, fn){ if (el) el.addEventListener(event, fn); }
 
-function safeOn(el, event, fn){
-  if (!el) return;
-  el.addEventListener(event, fn);
-}
+function clamp(n, min, max) { return Math.min(max, Math.max(min, n)); }
+function round1(n){ return Math.round(n * 10) / 10; }
 
-function clamp(n, min, max) {
-  return Math.min(max, Math.max(min, n));
-}
-
-function formatInt(n) {
-  const x = Math.round(n);
-  return x.toLocaleString();
-}
-
-function formatMaybeDecimal(n) {
-  const isInt = Math.abs(n - Math.round(n)) < 1e-9;
-  return (isInt ? Math.round(n) : Math.round(n * 10) / 10).toLocaleString();
+function fmt1(n){
+  // always show 1 decimal
+  return round1(n).toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 }
 
 function nowSavedText() {
@@ -97,46 +137,37 @@ function nowSavedText() {
   return d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit", second: "2-digit" });
 }
 
-function applyRounding(value, mode) {
-  if (mode === "floor") return Math.floor(value);
-  if (mode === "ceil") return Math.ceil(value);
-  if (mode === "nearest") return Math.round(value);
-  return value;
-}
-
-function actionIdFor(a) {
-  return `${a.day}__${a.action}`;
-}
-
-function cssSafe(str) {
-  return str.replace(/[^a-zA-Z0-9_-]/g, "_");
-}
+function actionIdFor(a) { return `${a.day}__${a.action}`; }
+function cssSafe(str) { return str.replace(/[^a-zA-Z0-9_-]/g, "_"); }
 
 function getBuffPct(nodeKey) {
   const level = Number(state.research[nodeKey] ?? 0);
-  return level * 0.05;
+  return level * 0.05; // 5% per level
+}
+
+function combinedMultiplierFor(actionRow){
+  const allPct = getBuffPct("All Points Increase");
+  const buffPct = (actionRow.buff && actionRow.buff !== "n/a") ? getBuffPct(actionRow.buff) : 0;
+  return { allPct, buffPct, totalPct: allPct + buffPct, mult: 1 + allPct + buffPct };
 }
 
 function pointsPerUnit(actionRow) {
-  const allPts = getBuffPct("All Points Increase");
-  const nodeBuff = (actionRow.buff && actionRow.buff !== "n/a") ? getBuffPct(actionRow.buff) : 0;
-  const adjusted = actionRow.basePoints * (1 + allPts + nodeBuff);
+  const { mult } = combinedMultiplierFor(actionRow);
+  const adjusted = actionRow.basePoints * mult;
   return adjusted / actionRow.usage;
 }
 
 function calcActionPoints(actionRow) {
   const id = actionIdFor(actionRow);
-  const entry = state.entries[id] ?? { amount: 0, mult: 1 };
+  const entry = state.entries[id] ?? { amount: 0 };
   const amt = Number(entry.amount) || 0;
-  const mult = Number(entry.mult) || 1;
-  const raw = amt * pointsPerUnit(actionRow) * mult;
-  return applyRounding(raw, state.rounding);
+  return round1(amt * pointsPerUnit(actionRow));
 }
 
 function calcTotalPoints() {
   const todays = ACTIONS.filter(a => a.day === state.day);
   const total = todays.reduce((sum, a) => sum + calcActionPoints(a), 0);
-  return applyRounding(total, state.rounding);
+  return round1(total);
 }
 
 function saveState() {
@@ -153,14 +184,17 @@ function loadState() {
     if (parsed && typeof parsed === "object") {
       state.tab = parsed.tab ?? state.tab;
       state.day = parsed.day ?? state.day;
-      state.rounding = parsed.rounding ?? state.rounding;
       state.research = { ...state.research, ...(parsed.research ?? {}) };
       state.entries = parsed.entries ?? {};
       state.speedups = { ...state.speedups, ...(parsed.speedups ?? {}) };
     }
-  } catch {
-    // ignore
-  }
+  } catch { /* ignore */ }
+}
+
+function setDayTheme(){
+  const el = $("dayTheme");
+  if (!el) return;
+  el.textContent = DAY_TITLES[state.day] || "—";
 }
 
 function setTab(tab) {
@@ -186,7 +220,7 @@ function setTab(tab) {
 
 function renderTotal() {
   const el = $("totalPoints");
-  if (el) el.textContent = formatInt(calcTotalPoints());
+  if (el) el.textContent = fmt1(calcTotalPoints());
 }
 
 function wireActionEvents() {
@@ -195,36 +229,17 @@ function wireActionEvents() {
       const id = e.target.dataset.amount;
       const val = e.target.value;
 
-      state.entries[id] = state.entries[id] ?? { amount: "", mult: 1 };
+      state.entries[id] = state.entries[id] ?? { amount: "" };
       state.entries[id].amount = val;
 
       const a = ACTIONS.find(x => actionIdFor(x) === id);
       if (a) {
         const pts = calcActionPoints(a);
-        const el = document.getElementById(`pts_${cssSafe(id)}`);
-        if (el) el.textContent = formatMaybeDecimal(pts);
+        const elPts = document.getElementById(`pts_${cssSafe(id)}`);
+        if (elPts) elPts.textContent = fmt1(pts);
       }
 
       renderTotal();
-      saveState();
-    });
-  });
-
-  document.querySelectorAll("button[data-mult-btn]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const id = btn.dataset.multBtn;
-      const cur = Number(state.entries[id]?.mult ?? 1);
-
-      const next = prompt("Set multiplier (example: 1, 1.1, 2.5):", String(cur));
-      if (next === null) return;
-
-      const num = Number(next);
-      if (!Number.isFinite(num) || num <= 0) return;
-
-      state.entries[id] = state.entries[id] ?? { amount: "", mult: 1 };
-      state.entries[id].mult = clamp(num, 0.01, 999);
-
-      renderActions();
       saveState();
     });
   });
@@ -235,30 +250,61 @@ function renderActions() {
   if (!list) return;
 
   list.innerHTML = "";
+  setDayTheme();
+
   const todays = ACTIONS.filter(a => a.day === state.day);
 
-  todays.forEach((a) => {
-    const id = actionIdFor(a);
-    const entry = state.entries[id] ?? { amount: "", mult: 1 };
-    const pts = calcActionPoints(a);
-    const hasTag = a.buff && a.buff !== "n/a";
-
+  // If Sunday, keep it simple.
+  if (state.day === "Sunday") {
     const card = document.createElement("div");
     card.className = "glass-card action-card";
     card.innerHTML = `
       <div class="flex items-start justify-between gap-3">
         <div class="min-w-0">
+          <div class="font-extrabold text-[15px] leading-snug">Rest Day</div>
+          <div class="mt-2 flex flex-wrap items-center gap-2">
+            <span class="pill">All Points Increase applies, but base is 0</span>
+          </div>
+        </div>
+        <div class="text-right shrink-0">
+          <div class="pointsText">0.0</div>
+          <div class="pointsLabel">Points</div>
+        </div>
+      </div>
+    `;
+    list.appendChild(card);
+    renderTotal();
+    return;
+  }
+
+  todays.forEach((a) => {
+    const id = actionIdFor(a);
+    const entry = state.entries[id] ?? { amount: "" };
+    const pts = calcActionPoints(a);
+
+    const { allPct, buffPct, totalPct, mult } = combinedMultiplierFor(a);
+
+    const hasBuff = a.buff && a.buff !== "n/a";
+    const allTxt = `All Points: +${Math.round(allPct * 100)}%`;
+    const buffTxt = hasBuff ? `${a.buff}: +${Math.round(buffPct * 100)}%` : `No action buff`;
+    const multTxt = `Multiplier: x${mult.toFixed(2)} (+${Math.round(totalPct * 100)}%)`;
+
+    const card = document.createElement("div");
+    card.className = "glass-card action-card";
+
+    card.innerHTML = `
+      <div class="flex items-start justify-between gap-3">
+        <div class="min-w-0">
           <div class="font-extrabold text-[15px] leading-snug">${a.action}</div>
           <div class="mt-2 flex flex-wrap items-center gap-2">
-            <button class="pill" type="button" data-mult-btn="${id}">
-              x${Number(entry.mult || 1).toFixed(2)} Mult
-            </button>
-            ${hasTag ? `<span class="pill tag">${a.buff.replace(" Motivation","")}</span>` : ""}
+            <span class="pill">${multTxt}</span>
+            <span class="pill">${allTxt}</span>
+            ${hasBuff ? `<span class="pill tag">${buffTxt}</span>` : `<span class="pill">${buffTxt}</span>`}
           </div>
         </div>
 
         <div class="text-right shrink-0">
-          <div class="pointsText" id="pts_${cssSafe(id)}">${formatMaybeDecimal(pts)}</div>
+          <div class="pointsText" id="pts_${cssSafe(id)}">${fmt1(pts)}</div>
           <div class="pointsLabel">Points</div>
         </div>
       </div>
@@ -344,7 +390,7 @@ function updateSpeedupTotals() {
 
   const m = $("totalMinutes");
   const h = $("totalHours");
-  if (m) m.textContent = formatInt(totalMin);
+  if (m) m.textContent = totalMin.toLocaleString();
   if (h) h.textContent = `${(totalMin / 60).toFixed(1)}h`;
 }
 
@@ -361,13 +407,6 @@ function wireGlobalEvents() {
     saveState();
   });
 
-  // rounding
-  safeOn($("roundingSelect"), "change", (e) => {
-    state.rounding = e.target.value;
-    renderActions();
-    saveState();
-  });
-
   // research dropdowns
   document.addEventListener("change", (e) => {
     const sel = e.target;
@@ -376,7 +415,7 @@ function wireGlobalEvents() {
     const key = sel.dataset.research;
     if (key) {
       state.research[key] = Number(sel.value) || 0;
-      renderActions();
+      renderActions();  // multiplier display updates here
       renderResearch();
       saveState();
     }
@@ -403,10 +442,6 @@ function wireGlobalEvents() {
     state.entries = {};
     state.speedups = Object.fromEntries(SPEEDUPS.map(s => [s.key, 0]));
     state.research = Object.fromEntries(RESEARCH_NODES.map(n => [n.key, 0]));
-    state.rounding = "none";
-
-    const r = $("roundingSelect");
-    if (r) r.value = "none";
 
     renderActions();
     renderResearch();
@@ -419,10 +454,7 @@ function init() {
   loadState();
 
   const day = $("daySelect");
-  const rnd = $("roundingSelect");
-
   if (day) day.value = state.day;
-  if (rnd) rnd.value = state.rounding;
 
   renderActions();
   renderResearch();
