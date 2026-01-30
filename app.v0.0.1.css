@@ -1,10 +1,6 @@
 :root{
   --glass: rgba(255,255,255,0.06);
-  --glass2: rgba(255,255,255,0.08);
   --stroke: rgba(255,255,255,0.10);
-  --stroke2: rgba(255,255,255,0.14);
-  --blue: rgb(59,130,246);
-  --blue2: rgb(37,99,235);
 }
 
 *{ font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
@@ -81,6 +77,8 @@
   font-size: 13px;
   color: rgba(255,255,255,0.65);
   transition: color 160ms ease;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .tabbtn.active{
@@ -101,6 +99,9 @@
   box-shadow: 0 14px 34px rgba(37,99,235,0.35);
   transition: transform 220ms ease;
   z-index: 1;
+
+  /* IMPORTANT FIX: do not intercept taps/clicks */
+  pointer-events: none;
 }
 
 .action-card{
