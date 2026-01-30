@@ -5,18 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover" />
   <title>Union Dual Pro</title>
 
-  <!-- Favicon -->
+  <!-- build: v0.0.1 -->
   <link rel="icon" type="image/png" href="./favicon.png" />
 
-  <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="./app.v0.1.css" />
+  <link rel="stylesheet" href="./app.v0.0.1.css" />
 </head>
 
 <body class="bg-slate-950 text-white">
@@ -43,20 +41,23 @@
 
     <!-- Tabs -->
     <nav class="px-4">
-      <div class="tabbar">
-        <button class="tabbtn" data-tab="calculator">
+      <div class="tabbar" role="tablist" aria-label="Main tabs">
+        <button class="tabbtn" type="button" data-tab="calculator" role="tab" aria-controls="tab-calculator">
           <span class="tabicon">🧮</span>
           <span>Calculator</span>
         </button>
-        <button class="tabbtn" data-tab="research">
+
+        <button class="tabbtn" type="button" data-tab="research" role="tab" aria-controls="tab-research">
           <span class="tabicon">⎇</span>
           <span>Research</span>
         </button>
-        <button class="tabbtn" data-tab="speedups">
+
+        <button class="tabbtn" type="button" data-tab="speedups" role="tab" aria-controls="tab-speedups">
           <span class="tabicon">⚡</span>
           <span>Speedups</span>
         </button>
-        <span class="tab-highlight" id="tabHighlight"></span>
+
+        <span class="tab-highlight" id="tabHighlight" aria-hidden="true"></span>
       </div>
     </nav>
 
@@ -99,7 +100,6 @@
           <div class="mt-1 text-[13px] text-white/70">
             Set your technology levels. Each level provides a <span class="font-semibold text-white/80">+5%</span> point bonus.
           </div>
-
           <div class="mt-4 space-y-3" id="researchList"></div>
         </div>
       </section>
@@ -133,13 +133,11 @@
           <div class="text-[11px] tracking-[0.2em] text-white/70 font-extrabold">TOTAL POINTS</div>
           <div id="totalPoints" class="text-[30px] font-black leading-none">0</div>
         </div>
-        <button id="resetBtn" class="reset-btn" title="Reset">
-          ↺
-        </button>
+        <button id="resetBtn" class="reset-btn" type="button" title="Reset">↺</button>
       </div>
     </div>
   </div>
 
-  <script src="./app.v0.1js"></script>
+  <script src="./app.v0.0.1.js" defer></script>
 </body>
 </html>
