@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover" />
-  <title>Union Dual Pro</title>
+  <title>Union Dual Points Calculator</title>
 
-  <!-- build: v0.0.1 -->
+  <!-- build: v0.0.2 -->
   <link rel="icon" type="image/png" href="./favicon.png" />
 
   <script src="https://cdn.tailwindcss.com"></script>
@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="./app.v0.0.1.css" />
+  <link rel="stylesheet" href="./app.v0.0.2.css" />
 </head>
 
 <body class="bg-slate-950 text-white">
@@ -25,7 +25,7 @@
         <div class="flex items-center gap-3">
           <img src="./favicon.png" alt="App Icon" class="h-9 w-9 rounded-xl shadow-soft ring-1 ring-white/10" />
           <div class="leading-tight">
-            <div class="text-[15px] font-extrabold tracking-wide">UNION DUAL PRO</div>
+            <div class="text-[15px] font-extrabold tracking-wide">UNION DUAL POINTS CALCULATOR</div>
             <div class="text-[12px] font-semibold text-sky-300/90 tracking-wide">X-CLASH ULTIMATE SURVIVOR</div>
           </div>
         </div>
@@ -62,7 +62,7 @@
     </nav>
 
     <!-- Content -->
-    <main class="px-4 pt-4 pb-32">
+    <main class="px-4 pt-4 pb-40">
       <!-- Calculator -->
       <section id="tab-calculator" class="tabpanel">
         <div class="grid grid-cols-2 gap-3">
@@ -79,18 +79,18 @@
             </select>
           </div>
 
+          <!-- Replaces "Rounding" -->
           <div class="glass-card p-4">
-            <div class="label">Rounding</div>
-            <select id="roundingSelect" class="select">
-              <option value="none">None</option>
-              <option value="floor">Floor</option>
-              <option value="ceil">Ceil</option>
-              <option value="nearest">Nearest</option>
-            </select>
+            <div class="label">Today's Theme</div>
+            <div id="dayTheme" class="day-theme">—</div>
           </div>
         </div>
 
         <div id="actionList" class="mt-4 space-y-3"></div>
+
+        <footer class="mt-6 text-center text-xs text-white/50">
+          Built by <span class="font-semibold text-white/70">[GoS] The_JDak</span>
+        </footer>
       </section>
 
       <!-- Research -->
@@ -101,6 +101,10 @@
             Set your technology levels. Each level provides a <span class="font-semibold text-white/80">+5%</span> point bonus.
           </div>
           <div class="mt-4 space-y-3" id="researchList"></div>
+
+          <footer class="mt-6 text-center text-xs text-white/50">
+            Built by <span class="font-semibold text-white/70">[GoS] The_JDak</span>
+          </footer>
         </div>
       </section>
 
@@ -122,6 +126,10 @@
               <div id="totalHours" class="big-metric">0.0h</div>
             </div>
           </div>
+
+          <footer class="mt-6 text-center text-xs text-white/50">
+            Built by <span class="font-semibold text-white/70">[GoS] The_JDak</span>
+          </footer>
         </div>
       </section>
     </main>
@@ -131,13 +139,13 @@
       <div class="bottom-inner">
         <div>
           <div class="text-[11px] tracking-[0.2em] text-white/70 font-extrabold">TOTAL POINTS</div>
-          <div id="totalPoints" class="text-[30px] font-black leading-none">0</div>
+          <div id="totalPoints" class="text-[30px] font-black leading-none">0.0</div>
         </div>
         <button id="resetBtn" class="reset-btn" type="button" title="Reset">↺</button>
       </div>
     </div>
   </div>
 
-  <script src="./app.v0.0.1.js" defer></script>
+  <script src="./app.v0.0.2.js" defer></script>
 </body>
 </html>
