@@ -1,8 +1,7 @@
+/* Union Dual Pro — v0.0.1 */
+
 /* =========================
-   DATA (from your Excel "points table")
-   - Base points are BEFORE buffs.
-   - "usage" is the quantity embedded in the action (used to compute points-per-unit).
-   - buff is either "n/a" or the research node name.
+   DATA (base points from your sheet)
 ========================= */
 
 const ACTIONS = [
@@ -41,7 +40,6 @@ const ACTIONS = [
   { day: "Sunday", action: "Increase Power 1 Point (Construction)", basePoints: 0.2, buff: "Construction Motivation", usage: 1 },
 ];
 
-// Research nodes from your Excel "1. Research Center"
 const RESEARCH_NODES = [
   { key: "All Points Increase", label: "All Points Increase" },
   { key: "Intelligence Motivation", label: "Intelligence Motivation" },
@@ -53,7 +51,6 @@ const RESEARCH_NODES = [
   { key: "Enemy Kill Motivation", label: "Enemy Kill Motivation" },
 ];
 
-// Speedups UI (not tied to points)
 const SPEEDUPS = [
   { key: "8h", label: "8H", minutes: 480 },
   { key: "3h", label: "3H", minutes: 180 },
@@ -63,30 +60,24 @@ const SPEEDUPS = [
   { key: "1m", label: "1M", minutes: 1 },
 ];
 
-// ---------- State ----------
 const STORAGE_KEY = "union_dual_pro_state_v1";
 
 const state = {
   tab: "calculator",
   day: "Monday",
   rounding: "none",
-
-  // research levels (0..20+ is fine)
   research: Object.fromEntries(RESEARCH_NODES.map(n => [n.key, 0])),
-
-  // per-action user entries
-  // actionId -> { amount: number, mult: number }
   entries: {},
-
-  // speedups counts
   speedups: Object.fromEntries(SPEEDUPS.map(s => [s.key, 0])),
 };
 
-function actionIdFor(a) {
-  return `${a.day}__${a.action}`;
+function $(id){ return document.getElementById(id); }
+
+function safeOn(el, event, fn){
+  if (!el) return;
+  el.addEventListener(event, fn);
 }
 
-// ---------- Utilities ----------
 function clamp(n, min, max) {
   return Math.min(max, Math.max(min, n));
 }
@@ -97,7 +88,6 @@ function formatInt(n) {
 }
 
 function formatMaybeDecimal(n) {
-  // points can be fractional, but UI should feel like the game: show whole numbers unless needed
   const isInt = Math.abs(n - Math.round(n)) < 1e-9;
   return (isInt ? Math.round(n) : Math.round(n * 10) / 10).toLocaleString();
 }
@@ -114,8 +104,15 @@ function applyRounding(value, mode) {
   return value;
 }
 
+function actionIdFor(a) {
+  return `${a.day}__${a.action}`;
+}
+
+function cssSafe(str) {
+  return str.replace(/[^a-zA-Z0-9_-]/g, "_");
+}
+
 function getBuffPct(nodeKey) {
-  // Each level = +5%
   const level = Number(state.research[nodeKey] ?? 0);
   return level * 0.05;
 }
@@ -132,7 +129,6 @@ function calcActionPoints(actionRow) {
   const entry = state.entries[id] ?? { amount: 0, mult: 1 };
   const amt = Number(entry.amount) || 0;
   const mult = Number(entry.mult) || 1;
-
   const raw = amt * pointsPerUnit(actionRow) * mult;
   return applyRounding(raw, state.rounding);
 }
@@ -143,10 +139,10 @@ function calcTotalPoints() {
   return applyRounding(total, state.rounding);
 }
 
-// ---------- Save/Load ----------
 function saveState() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  document.getElementById("savedText").textContent = `Saved ${nowSavedText()}`;
+  const s = $("savedText");
+  if (s) s.textContent = `Saved ${nowSavedText()}`;
 }
 
 function loadState() {
@@ -154,13 +150,10 @@ function loadState() {
   if (!raw) return;
   try {
     const parsed = JSON.parse(raw);
-
-    // shallow merge (keep any new defaults)
     if (parsed && typeof parsed === "object") {
       state.tab = parsed.tab ?? state.tab;
       state.day = parsed.day ?? state.day;
       state.rounding = parsed.rounding ?? state.rounding;
-
       state.research = { ...state.research, ...(parsed.research ?? {}) };
       state.entries = parsed.entries ?? {};
       state.speedups = { ...state.speedups, ...(parsed.speedups ?? {}) };
@@ -170,48 +163,94 @@ function loadState() {
   }
 }
 
-// ---------- Render ----------
 function setTab(tab) {
   state.tab = tab;
 
-  // panels
-  document.getElementById("tab-calculator").classList.toggle("hidden", tab !== "calculator");
-  document.getElementById("tab-research").classList.toggle("hidden", tab !== "research");
-  document.getElementById("tab-speedups").classList.toggle("hidden", tab !== "speedups");
+  const calc = $("tab-calculator");
+  const res = $("tab-research");
+  const spd = $("tab-speedups");
 
-  // buttons + highlight
+  if (calc) calc.classList.toggle("hidden", tab !== "calculator");
+  if (res)  res.classList.toggle("hidden", tab !== "research");
+  if (spd)  spd.classList.toggle("hidden", tab !== "speedups");
+
   const btns = [...document.querySelectorAll(".tabbtn")];
   btns.forEach((b) => b.classList.toggle("active", b.dataset.tab === tab));
 
   const idx = Math.max(0, btns.findIndex(b => b.dataset.tab === tab));
-  const highlight = document.getElementById("tabHighlight");
-  highlight.style.transform = `translateX(${idx * 100}%)`;
+  const highlight = $("tabHighlight");
+  if (highlight) highlight.style.transform = `translateX(${idx * 100}%)`;
 
   saveState();
 }
 
-function renderActions() {
-  const list = document.getElementById("actionList");
-  list.innerHTML = "";
+function renderTotal() {
+  const el = $("totalPoints");
+  if (el) el.textContent = formatInt(calcTotalPoints());
+}
 
+function wireActionEvents() {
+  document.querySelectorAll("input[data-amount]").forEach((inp) => {
+    inp.addEventListener("input", (e) => {
+      const id = e.target.dataset.amount;
+      const val = e.target.value;
+
+      state.entries[id] = state.entries[id] ?? { amount: "", mult: 1 };
+      state.entries[id].amount = val;
+
+      const a = ACTIONS.find(x => actionIdFor(x) === id);
+      if (a) {
+        const pts = calcActionPoints(a);
+        const el = document.getElementById(`pts_${cssSafe(id)}`);
+        if (el) el.textContent = formatMaybeDecimal(pts);
+      }
+
+      renderTotal();
+      saveState();
+    });
+  });
+
+  document.querySelectorAll("button[data-mult-btn]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const id = btn.dataset.multBtn;
+      const cur = Number(state.entries[id]?.mult ?? 1);
+
+      const next = prompt("Set multiplier (example: 1, 1.1, 2.5):", String(cur));
+      if (next === null) return;
+
+      const num = Number(next);
+      if (!Number.isFinite(num) || num <= 0) return;
+
+      state.entries[id] = state.entries[id] ?? { amount: "", mult: 1 };
+      state.entries[id].mult = clamp(num, 0.01, 999);
+
+      renderActions();
+      saveState();
+    });
+  });
+}
+
+function renderActions() {
+  const list = $("actionList");
+  if (!list) return;
+
+  list.innerHTML = "";
   const todays = ACTIONS.filter(a => a.day === state.day);
 
   todays.forEach((a) => {
     const id = actionIdFor(a);
     const entry = state.entries[id] ?? { amount: "", mult: 1 };
     const pts = calcActionPoints(a);
+    const hasTag = a.buff && a.buff !== "n/a";
 
     const card = document.createElement("div");
     card.className = "glass-card action-card";
-
-    const hasTag = a.buff && a.buff !== "n/a";
-
     card.innerHTML = `
       <div class="flex items-start justify-between gap-3">
         <div class="min-w-0">
           <div class="font-extrabold text-[15px] leading-snug">${a.action}</div>
           <div class="mt-2 flex flex-wrap items-center gap-2">
-            <button class="pill" data-mult-btn="${id}">
+            <button class="pill" type="button" data-mult-btn="${id}">
               x${Number(entry.mult || 1).toFixed(2)} Mult
             </button>
             ${hasTag ? `<span class="pill tag">${a.buff.replace(" Motivation","")}</span>` : ""}
@@ -240,38 +279,7 @@ function renderActions() {
   renderTotal();
 }
 
-function renderTotal() {
-  document.getElementById("totalPoints").textContent = formatInt(calcTotalPoints());
-}
-
-function renderResearch() {
-  const wrap = document.getElementById("researchList");
-  wrap.innerHTML = "";
-
-  RESEARCH_NODES.forEach((node) => {
-    const lvl = Number(state.research[node.key] ?? 0);
-    const pct = (lvl * 5);
-
-    const row = document.createElement("div");
-    row.className = "glass-card p-4 flex items-center justify-between gap-3";
-
-    row.innerHTML = `
-      <div class="min-w-0">
-        <div class="font-extrabold">${node.label}</div>
-        <div class="text-[12px] text-sky-300/90 font-bold">+${pct}% Bonus</div>
-      </div>
-
-      <select class="select w-[120px]" data-research="${node.key}">
-        ${makeLevelOptions(lvl)}
-      </select>
-    `;
-
-    wrap.appendChild(row);
-  });
-}
-
 function makeLevelOptions(selected) {
-  // sane range; you can extend later if needed
   const max = 30;
   let html = "";
   for (let i = 0; i <= max; i++) {
@@ -281,8 +289,35 @@ function makeLevelOptions(selected) {
   return html;
 }
 
+function renderResearch() {
+  const wrap = $("researchList");
+  if (!wrap) return;
+
+  wrap.innerHTML = "";
+
+  RESEARCH_NODES.forEach((node) => {
+    const lvl = Number(state.research[node.key] ?? 0);
+    const pct = (lvl * 5);
+
+    const row = document.createElement("div");
+    row.className = "glass-card p-4 flex items-center justify-between gap-3";
+    row.innerHTML = `
+      <div class="min-w-0">
+        <div class="font-extrabold">${node.label}</div>
+        <div class="text-[12px] text-sky-300/90 font-bold">+${pct}% Bonus</div>
+      </div>
+      <select class="select w-[120px]" data-research="${node.key}">
+        ${makeLevelOptions(lvl)}
+      </select>
+    `;
+    wrap.appendChild(row);
+  });
+}
+
 function renderSpeedups() {
-  const grid = document.getElementById("speedupsGrid");
+  const grid = $("speedupsGrid");
+  if (!grid) return;
+
   grid.innerHTML = "";
 
   SPEEDUPS.forEach((s) => {
@@ -307,56 +342,10 @@ function updateSpeedupTotals() {
     totalMin += count * s.minutes;
   });
 
-  document.getElementById("totalMinutes").textContent = formatInt(totalMin);
-  document.getElementById("totalHours").textContent = `${(totalMin / 60).toFixed(1)}h`;
-}
-
-// ---------- Events ----------
-function wireActionEvents() {
-  // Amount inputs
-  document.querySelectorAll("input[data-amount]").forEach((inp) => {
-    inp.addEventListener("input", (e) => {
-      const id = e.target.dataset.amount;
-      const val = e.target.value;
-
-      state.entries[id] = state.entries[id] ?? { amount: "", mult: 1 };
-      state.entries[id].amount = val;
-
-      // live update points + total
-      const a = ACTIONS.find(x => actionIdFor(x) === id);
-      if (a) {
-        const pts = calcActionPoints(a);
-        const el = document.getElementById(`pts_${cssSafe(id)}`);
-        if (el) el.textContent = formatMaybeDecimal(pts);
-      }
-      renderTotal();
-      saveState();
-    });
-  });
-
-  // Mult buttons (simple prompt — clean and fast)
-  document.querySelectorAll("button[data-mult-btn]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const id = btn.dataset.multBtn;
-      const cur = Number(state.entries[id]?.mult ?? 1);
-
-      const next = prompt("Set multiplier (example: 1, 1.1, 2.5):", String(cur));
-      if (next === null) return;
-
-      const num = Number(next);
-      if (!Number.isFinite(num) || num <= 0) return;
-
-      state.entries[id] = state.entries[id] ?? { amount: "", mult: 1 };
-      state.entries[id].mult = clamp(num, 0.01, 999);
-
-      renderActions();
-      saveState();
-    });
-  });
-}
-
-function cssSafe(str) {
-  return str.replace(/[^a-zA-Z0-9_-]/g, "_");
+  const m = $("totalMinutes");
+  const h = $("totalHours");
+  if (m) m.textContent = formatInt(totalMin);
+  if (h) h.textContent = `${(totalMin / 60).toFixed(1)}h`;
 }
 
 function wireGlobalEvents() {
@@ -365,15 +354,15 @@ function wireGlobalEvents() {
     b.addEventListener("click", () => setTab(b.dataset.tab));
   });
 
-  // day select
-  document.getElementById("daySelect").addEventListener("change", (e) => {
+  // day
+  safeOn($("daySelect"), "change", (e) => {
     state.day = e.target.value;
     renderActions();
     saveState();
   });
 
   // rounding
-  document.getElementById("roundingSelect").addEventListener("change", (e) => {
+  safeOn($("roundingSelect"), "change", (e) => {
     state.rounding = e.target.value;
     renderActions();
     saveState();
@@ -387,14 +376,13 @@ function wireGlobalEvents() {
     const key = sel.dataset.research;
     if (key) {
       state.research[key] = Number(sel.value) || 0;
-      // research impacts calculator points immediately
       renderActions();
       renderResearch();
       saveState();
     }
   });
 
-  // speedups inputs
+  // speedups
   document.addEventListener("input", (e) => {
     const inp = e.target;
     if (!(inp instanceof HTMLInputElement)) return;
@@ -409,7 +397,7 @@ function wireGlobalEvents() {
   });
 
   // reset
-  document.getElementById("resetBtn").addEventListener("click", () => {
+  safeOn($("resetBtn"), "click", () => {
     if (!confirm("Reset all inputs?")) return;
 
     state.entries = {};
@@ -417,7 +405,9 @@ function wireGlobalEvents() {
     state.research = Object.fromEntries(RESEARCH_NODES.map(n => [n.key, 0]));
     state.rounding = "none";
 
-    document.getElementById("roundingSelect").value = "none";
+    const r = $("roundingSelect");
+    if (r) r.value = "none";
+
     renderActions();
     renderResearch();
     renderSpeedups();
@@ -425,25 +415,24 @@ function wireGlobalEvents() {
   });
 }
 
-// ---------- Init ----------
 function init() {
   loadState();
 
-  document.getElementById("daySelect").value = state.day;
-  document.getElementById("roundingSelect").value = state.rounding;
+  const day = $("daySelect");
+  const rnd = $("roundingSelect");
 
-  // first paint
+  if (day) day.value = state.day;
+  if (rnd) rnd.value = state.rounding;
+
   renderActions();
   renderResearch();
   renderSpeedups();
-
   wireGlobalEvents();
 
-  // tab last
   setTab(state.tab);
 
-  // show saved time even on first load
-  document.getElementById("savedText").textContent = `Saved ${nowSavedText()}`;
+  const s = $("savedText");
+  if (s) s.textContent = `Saved ${nowSavedText()}`;
 }
 
 init();
