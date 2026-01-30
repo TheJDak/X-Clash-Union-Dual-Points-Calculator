@@ -1,4 +1,4 @@
-/* Union Dual Points Calculator — v0.0.2 */
+/* Union Dual Points Calculator — v0.0.3 */
 
 const DAY_TITLES = {
   "Monday": "Intelligence Training",
@@ -70,27 +70,55 @@ const ACTIONS = [
   { day:"Friday", action:"Lose 1 Soldier", basePoints:2, buff:"n/a", usage:1 },
   { day:"Friday", action:"Use 1 Hero EXP Potion", basePoints:1500, buff:"n/a", usage:1 },
 
-  /* Saturday (your expanded “Lose Lv X Soldier” set) */
-  { day:"Saturday", action:"Lose 1 Soldier", basePoints:2, buff:"n/a", usage:1 },
-  { day:"Saturday", action:"Lose 1 Lv. 1 Soldier", basePoints:2, buff:"n/a", usage:1 },
-  { day:"Saturday", action:"Lose 1 Lv. 2 Soldier", basePoints:3, buff:"n/a", usage:1 },
-  { day:"Saturday", action:"Lose 1 Lv. 3 Soldier", basePoints:4, buff:"n/a", usage:1 },
-  { day:"Saturday", action:"Lose 1 Lv. 4 Soldier", basePoints:5, buff:"n/a", usage:1 },
-  { day:"Saturday", action:"Lose 1 Lv. 5 Soldier", basePoints:6, buff:"n/a", usage:1 },
-  { day:"Saturday", action:"Lose 1 Lv. 6 Soldier", basePoints:7, buff:"n/a", usage:1 },
-  { day:"Saturday", action:"Lose 1 Lv. 7 Soldier", basePoints:8, buff:"n/a", usage:1 },
-  { day:"Saturday", action:"Lose 1 Lv. 8 Soldier", basePoints:9, buff:"n/a", usage:1 },
-  { day:"Saturday", action:"Lose 1 Lv. 9 Soldier", basePoints:10, buff:"n/a", usage:1 },
-  { day:"Saturday", action:"Lose 1 Lv. 10 Soldier", basePoints:11, buff:"n/a", usage:1 },
+  /* Saturday */
+/* Saturday — Economy & Speedups */
+{ day:"Saturday", action:"Dispatch 1 Legendary Wagon", basePoints:100000, buff:"n/a", usage:1 },
+{ day:"Saturday", action:"Perform 1 orange Tavern Quest", basePoints:75000, buff:"n/a", usage:1 },
+{ day:"Saturday", action:"Use 1-minute Building Speed Up", basePoints:50, buff:"Accelerator Motivation", usage:1 },
+{ day:"Saturday", action:"Use 1-Minute Technology Speedup", basePoints:50, buff:"Accelerator Motivation", usage:1 },
+{ day:"Saturday", action:"Use 1-Minute Training Speedup", basePoints:50, buff:"Accelerator Motivation", usage:1 },
+{ day:"Saturday", action:"Use 1-Minute Healing Speedup", basePoints:50, buff:"Accelerator Motivation", usage:1 },
+  /* Saturday — Defeat (specific matched union) */
+{ day:"Saturday", action:"Defeat 1 Lv. 1 Soldier (specific matched union)", basePoints:10, buff:"Enemy Kill Motivation", usage:1 },
+{ day:"Saturday", action:"Defeat 1 Lv. 2 Soldier (specific matched union)", basePoints:15, buff:"Enemy Kill Motivation", usage:1 },
+{ day:"Saturday", action:"Defeat 1 Lv. 3 Soldier (specific matched union)", basePoints:20, buff:"Enemy Kill Motivation", usage:1 },
+{ day:"Saturday", action:"Defeat 1 Lv. 4 Soldier (specific matched union)", basePoints:25, buff:"Enemy Kill Motivation", usage:1 },
+{ day:"Saturday", action:"Defeat 1 Lv. 5 Soldier (specific matched union)", basePoints:30, buff:"Enemy Kill Motivation", usage:1 },
+{ day:"Saturday", action:"Defeat 1 Lv. 6 Soldier (specific matched union)", basePoints:35, buff:"Enemy Kill Motivation", usage:1 },
+{ day:"Saturday", action:"Defeat 1 Lv. 7 Soldier (specific matched union)", basePoints:40, buff:"Enemy Kill Motivation", usage:1 },
+{ day:"Saturday", action:"Defeat 1 Lv. 8 Soldier (specific matched union)", basePoints:45, buff:"Enemy Kill Motivation", usage:1 },
+{ day:"Saturday", action:"Defeat 1 Lv. 9 Soldier (specific matched union)", basePoints:50, buff:"Enemy Kill Motivation", usage:1 },
+{ day:"Saturday", action:"Defeat 1 Lv. 10 Soldier (specific matched union)", basePoints:55, buff:"Enemy Kill Motivation", usage:1 },
+  /* Saturday — Defeat (normal) */
+{ day:"Saturday", action:"Defeat 1 Lv. 1 Soldier", basePoints:2, buff:"Enemy Kill Motivation", usage:1 },
+{ day:"Saturday", action:"Defeat 1 Lv. 2 Soldier", basePoints:3, buff:"Enemy Kill Motivation", usage:1 },
+{ day:"Saturday", action:"Defeat 1 Lv. 3 Soldier", basePoints:4, buff:"Enemy Kill Motivation", usage:1 },
+{ day:"Saturday", action:"Defeat 1 Lv. 4 Soldier", basePoints:5, buff:"Enemy Kill Motivation", usage:1 },
+{ day:"Saturday", action:"Defeat 1 Lv. 5 Soldier", basePoints:6, buff:"Enemy Kill Motivation", usage:1 },
+{ day:"Saturday", action:"Defeat 1 Lv. 6 Soldier", basePoints:7, buff:"Enemy Kill Motivation", usage:1 },
+{ day:"Saturday", action:"Defeat 1 Lv. 7 Soldier", basePoints:8, buff:"Enemy Kill Motivation", usage:1 },
+{ day:"Saturday", action:"Defeat 1 Lv. 8 Soldier", basePoints:9, buff:"Enemy Kill Motivation", usage:1 },
+{ day:"Saturday", action:"Defeat 1 Lv. 9 Soldier", basePoints:10, buff:"Enemy Kill Motivation", usage:1 },
+{ day:"Saturday", action:"Defeat 1 Lv. 10 Soldier", basePoints:11, buff:"Enemy Kill Motivation", usage:1 },
+/* Saturday — Lose */
+{ day:"Saturday", action:"Lose 1 Lv. 1 Soldier", basePoints:2, buff:"n/a", usage:1 },
+{ day:"Saturday", action:"Lose 1 Lv. 2 Soldier", basePoints:3, buff:"n/a", usage:1 },
+{ day:"Saturday", action:"Lose 1 Lv. 3 Soldier", basePoints:4, buff:"n/a", usage:1 },
+{ day:"Saturday", action:"Lose 1 Lv. 4 Soldier", basePoints:5, buff:"n/a", usage:1 },
+{ day:"Saturday", action:"Lose 1 Lv. 5 Soldier", basePoints:6, buff:"n/a", usage:1 },
+{ day:"Saturday", action:"Lose 1 Lv. 6 Soldier", basePoints:7, buff:"n/a", usage:1 },
+{ day:"Saturday", action:"Lose 1 Lv. 7 Soldier", basePoints:8, buff:"n/a", usage:1 },
+{ day:"Saturday", action:"Lose 1 Lv. 8 Soldier", basePoints:9, buff:"n/a", usage:1 },
+{ day:"Saturday", action:"Lose 1 Lv. 9 Soldier", basePoints:10, buff:"n/a", usage:1 },
+{ day:"Saturday", action:"Lose 1 Lv. 10 Soldier", basePoints:11, buff:"n/a", usage:1 },
+
+
 
   /* Sunday */
   { day:"Sunday", action:"Rest Day", basePoints:0, buff:"n/a", usage:1 }
 ];
 
-/* Research nodes:
-   - "All Points Increase" applies to everything
-   - action buff applies only to matching action rows
-*/
+/* Research nodes */
 const RESEARCH_NODES = [
   { key: "All Points Increase", label: "All Points Increase" },
   { key: "Intelligence Motivation", label: "Intelligence Motivation" },
@@ -111,7 +139,8 @@ const SPEEDUPS = [
   { key: "1m", label: "1M", minutes: 1 },
 ];
 
-const STORAGE_KEY = "union_dual_points_state_v002";
+/* IMPORTANT: update storage key per version to avoid weird “old settings” behavior */
+const STORAGE_KEY = "union_dual_points_state_v003";
 
 const state = {
   tab: "calculator",
@@ -128,7 +157,6 @@ function clamp(n, min, max) { return Math.min(max, Math.max(min, n)); }
 function round1(n){ return Math.round(n * 10) / 10; }
 
 function fmt1(n){
-  // always show 1 decimal
   return round1(n).toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 }
 
@@ -254,7 +282,6 @@ function renderActions() {
 
   const todays = ACTIONS.filter(a => a.day === state.day);
 
-  // If Sunday, keep it simple.
   if (state.day === "Sunday") {
     const card = document.createElement("div");
     card.className = "glass-card action-card";
@@ -325,8 +352,16 @@ function renderActions() {
   renderTotal();
 }
 
-function makeLevelOptions(selected) {
-  const max = 30;
+/* ====== FIX: max levels differ by node ====== */
+function maxLevelForResearchKey(key){
+  // You requested:
+  // - All Points Increase max 20
+  // - all Motivation nodes max 10
+  if (key === "All Points Increase") return 20;
+  return 10;
+}
+
+function makeLevelOptions(selected, max) {
   let html = "";
   for (let i = 0; i <= max; i++) {
     const sel = (i === Number(selected)) ? "selected" : "";
@@ -342,7 +377,13 @@ function renderResearch() {
   wrap.innerHTML = "";
 
   RESEARCH_NODES.forEach((node) => {
-    const lvl = Number(state.research[node.key] ?? 0);
+    let lvl = Number(state.research[node.key] ?? 0);
+
+    const maxLvl = maxLevelForResearchKey(node.key);
+    // clamp stored values if someone had an older higher max
+    lvl = clamp(lvl, 0, maxLvl);
+    state.research[node.key] = lvl;
+
     const pct = (lvl * 5);
 
     const row = document.createElement("div");
@@ -353,7 +394,7 @@ function renderResearch() {
         <div class="text-[12px] text-sky-300/90 font-bold">+${pct}% Bonus</div>
       </div>
       <select class="select w-[120px]" data-research="${node.key}">
-        ${makeLevelOptions(lvl)}
+        ${makeLevelOptions(lvl, maxLvl)}
       </select>
     `;
     wrap.appendChild(row);
@@ -414,8 +455,10 @@ function wireGlobalEvents() {
 
     const key = sel.dataset.research;
     if (key) {
-      state.research[key] = Number(sel.value) || 0;
-      renderActions();  // multiplier display updates here
+      const maxLvl = maxLevelForResearchKey(key);
+      state.research[key] = clamp(Number(sel.value) || 0, 0, maxLvl);
+
+      renderActions();
       renderResearch();
       saveState();
     }
